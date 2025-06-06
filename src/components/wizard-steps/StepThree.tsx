@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileCheck, ArrowLeft, Upload } from 'lucide-react';
@@ -14,25 +13,34 @@ interface StepThreeProps {
 }
 
 const StepThree = ({ data, updateData, onNext, onPrev }: StepThreeProps) => {
-  const [fileContent, setFileContent] = useState<string>(data.fileContent || '');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(data.uploadedFile || null);
   const [error, setError] = useState('');
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+      if (error) setError('');
+    }
+  };
+
   const handleValidateFiles = () => {
-    if (!fileContent.trim()) {
-      setError('Por favor, insira o conteúdo dos arquivos para validação');
+    if (!uploadedFile) {
+      setError('Por favor, faça upload de um arquivo para validação');
       return;
     }
 
-    console.log('Iniciando validação de arquivos:', fileContent);
+    console.log('Iniciando validação de arquivo:', uploadedFile.name);
     
     // Simula processo de validação
     const validationResult = {
       status: 'success',
-      message: 'Arquivos validados com sucesso',
+      message: 'Arquivo validado com sucesso',
       logs: `=== RELATÓRIO DE VALIDAÇÃO ===
 Data: ${new Date().toLocaleString()}
-Arquivos processados: 3
-Linhas analisadas: ${fileContent.split('\n').length}
+Arquivo: ${uploadedFile.name}
+Tamanho: ${(uploadedFile.size / 1024).toFixed(2)} KB
+Tipo: ${uploadedFile.type}
 
 ✓ Estrutura de dados: OK
 ✓ Formatação: OK  
@@ -47,11 +55,11 @@ Linhas analisadas: ${fileContent.split('\n').length}
 
 === STATUS FINAL ===
 Validação concluída com sucesso!
-Arquivos prontos para processamento.`
+Arquivo pronto para processamento.`
     };
 
     updateData({ 
-      fileContent,
+      uploadedFile,
       validationResult 
     });
     
@@ -59,12 +67,12 @@ Arquivos prontos para processamento.`
   };
 
   const handleNext = () => {
-    if (!fileContent.trim()) {
-      setError('Por favor, insira o conteúdo dos arquivos antes de continuar');
+    if (!uploadedFile) {
+      setError('Por favor, faça upload de um arquivo antes de continuar');
       return;
     }
     
-    updateData({ fileContent });
+    updateData({ uploadedFile });
     onNext();
   };
 
@@ -73,56 +81,44 @@ Arquivos prontos para processamento.`
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Validação de Arquivos
+          Upload de Arquivos
         </h2>
         <p className="text-gray-600">
-          Cole o conteúdo dos seus arquivos para validação
+          Faça upload dos seus arquivos para validação
         </p>
       </div>
 
-      {/* File Content Input */}
+      {/* File Upload */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="w-5 h-5" />
-            Conteúdo dos Arquivos
+            Upload de Arquivo
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fileContent" className="text-sm font-medium text-gray-700">
-              Cole o conteúdo dos arquivos aqui (máximo 1000 caracteres)
+            <Label htmlFor="fileUpload" className="text-sm font-medium text-gray-700">
+              Selecione o arquivo para validação
             </Label>
             <div className="flex gap-4">
               <div className="flex-1">
-                <Textarea
-                  id="fileContent"
-                  placeholder="Cole aqui o conteúdo dos arquivos que deseja validar..."
-                  value={fileContent}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value.length <= 1000) {
-                      setFileContent(value);
-                      if (error) setError('');
-                    }
-                  }}
-                  className={`min-h-[200px] resize-none ${error ? 'border-red-500' : ''}`}
-                  maxLength={1000}
+                <input
+                  id="fileUpload"
+                  type="file"
+                  onChange={handleFileUpload}
+                  className="w-full p-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  accept=".txt,.csv,.json,.xml"
                 />
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-xs text-gray-500">
-                    {fileContent.length}/1000 caracteres
-                  </span>
-                  {error && (
-                    <p className="text-sm text-red-600">{error}</p>
-                  )}
-                </div>
+                {error && (
+                  <p className="text-sm text-red-600 mt-2">{error}</p>
+                )}
               </div>
               <div className="flex flex-col justify-center">
                 <Button
                   onClick={handleValidateFiles}
                   className="flex items-center gap-2 whitespace-nowrap"
-                  disabled={!fileContent.trim()}
+                  disabled={!uploadedFile}
                 >
                   <FileCheck className="w-4 h-4" />
                   Validador de arquivos
@@ -131,10 +127,13 @@ Arquivos prontos para processamento.`
             </div>
           </div>
 
-          {fileContent && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-700">
-                ✓ Conteúdo carregado. Clique em "Validador de arquivos" para processar ou continue para a próxima etapa.
+          {uploadedFile && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-700">
+                ✓ Arquivo carregado: <strong>{uploadedFile.name}</strong> ({(uploadedFile.size / 1024).toFixed(2)} KB)
+              </p>
+              <p className="text-sm text-green-600 mt-1">
+                Clique em "Validador de arquivos" para processar ou continue para a próxima etapa.
               </p>
             </div>
           )}
@@ -147,7 +146,7 @@ Arquivos prontos para processamento.`
           <ArrowLeft className="w-4 h-4" />
           Voltar
         </Button>
-        <Button onClick={handleNext} className="px-8" disabled={!fileContent.trim()}>
+        <Button onClick={handleNext} className="px-8" disabled={!uploadedFile}>
           Continuar
         </Button>
       </div>
