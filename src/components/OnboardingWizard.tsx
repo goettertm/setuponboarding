@@ -33,7 +33,7 @@ const OnboardingWizard = () => {
   const progress = (currentStep / totalSteps) * 100;
 
   const steps = [
-    { number: 1, title: 'Dados Básicos', completed: currentStep > 1 },
+    { number: 1, title: 'Informações iniciais', completed: currentStep > 1 },
     { number: 2, title: 'Manuais', completed: currentStep > 2 },
     { number: 3, title: 'Validação', completed: currentStep > 3 },
     { number: 4, title: 'Resultado', completed: currentStep > 4 },
