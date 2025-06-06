@@ -8,25 +8,16 @@ import StepOne from './wizard-steps/StepOne';
 import StepTwo from './wizard-steps/StepTwo';
 import StepThree from './wizard-steps/StepThree';
 import StepFour from './wizard-steps/StepFour';
-import StepFive from './wizard-steps/StepFive';
 import StepSix from './wizard-steps/StepSix';
 
 interface OnboardingData {
   clientName: string;
   cnpj: string;
-  companySize: string;
-  industry: string;
-  mainGoals: string[];
-  integrations: string[];
-  preferences: {
-    notifications: boolean;
-    newsletter: boolean;
-    support: string;
-  };
-  contact: {
-    email: string;
-    phone: string;
-    preferredContact: string;
+  fileContent: string;
+  validationResult?: {
+    status: string;
+    message: string;
+    logs: string;
   };
 }
 
@@ -35,32 +26,18 @@ const OnboardingWizard = () => {
   const [data, setData] = useState<OnboardingData>({
     clientName: '',
     cnpj: '',
-    companySize: '',
-    industry: '',
-    mainGoals: [],
-    integrations: [],
-    preferences: {
-      notifications: true,
-      newsletter: false,
-      support: '',
-    },
-    contact: {
-      email: '',
-      phone: '',
-      preferredContact: '',
-    },
+    fileContent: '',
   });
 
-  const totalSteps = 6;
+  const totalSteps = 5;
   const progress = (currentStep / totalSteps) * 100;
 
   const steps = [
     { number: 1, title: 'Dados Básicos', completed: currentStep > 1 },
-    { number: 2, title: 'Empresa', completed: currentStep > 2 },
-    { number: 3, title: 'Objetivos', completed: currentStep > 3 },
-    { number: 4, title: 'Integrações', completed: currentStep > 4 },
-    { number: 5, title: 'Preferências', completed: currentStep > 5 },
-    { number: 6, title: 'Finalização', completed: currentStep > 6 },
+    { number: 2, title: 'Manuais', completed: currentStep > 2 },
+    { number: 3, title: 'Validação', completed: currentStep > 3 },
+    { number: 4, title: 'Resultado', completed: currentStep > 4 },
+    { number: 5, title: 'Ativação', completed: currentStep > 5 },
   ];
 
   const nextStep = () => {
@@ -90,8 +67,6 @@ const OnboardingWizard = () => {
       case 4:
         return <StepFour data={data} updateData={updateData} onNext={nextStep} onPrev={prevStep} />;
       case 5:
-        return <StepFive data={data} updateData={updateData} onNext={nextStep} onPrev={prevStep} />;
-      case 6:
         return <StepSix data={data} onPrev={prevStep} />;
       default:
         return <StepOne data={data} updateData={updateData} onNext={nextStep} />;

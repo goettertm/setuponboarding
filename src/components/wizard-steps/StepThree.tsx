@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, ArrowLeft, TrendingUp, BarChart, Shield, Zap } from 'lucide-react';
+import { FileCheck, ArrowLeft, Upload } from 'lucide-react';
 
 interface StepThreeProps {
   data: any;
@@ -13,69 +14,57 @@ interface StepThreeProps {
 }
 
 const StepThree = ({ data, updateData, onNext, onPrev }: StepThreeProps) => {
-  const [selectedGoals, setSelectedGoals] = useState<string[]>(data.mainGoals || []);
+  const [fileContent, setFileContent] = useState<string>(data.fileContent || '');
   const [error, setError] = useState('');
 
-  const goals = [
-    {
-      id: 'efficiency',
-      label: 'Aumentar Eficiência Operacional',
-      description: 'Otimizar processos e reduzir custos',
-      icon: TrendingUp,
-    },
-    {
-      id: 'analytics',
-      label: 'Melhorar Análise de Dados',
-      description: 'Obter insights mais precisos do negócio',
-      icon: BarChart,
-    },
-    {
-      id: 'security',
-      label: 'Fortalecer Segurança',
-      description: 'Proteger dados e sistemas',
-      icon: Shield,
-    },
-    {
-      id: 'automation',
-      label: 'Automatizar Processos',
-      description: 'Reduzir tarefas manuais',
-      icon: Zap,
-    },
-    {
-      id: 'integration',
-      label: 'Integrar Sistemas',
-      description: 'Conectar diferentes plataformas',
-      icon: Target,
-    },
-    {
-      id: 'scale',
-      label: 'Escalar Operações',
-      description: 'Preparar para crescimento',
-      icon: TrendingUp,
-    },
-  ];
-
-  const toggleGoal = (goalId: string) => {
-    setSelectedGoals(prev => {
-      const newGoals = prev.includes(goalId)
-        ? prev.filter(id => id !== goalId)
-        : [...prev, goalId];
-      
-      if (error && newGoals.length > 0) {
-        setError('');
-      }
-      
-      return newGoals;
-    });
-  };
-
-  const handleNext = () => {
-    if (selectedGoals.length === 0) {
-      setError('Selecione pelo menos um objetivo');
+  const handleValidateFiles = () => {
+    if (!fileContent.trim()) {
+      setError('Por favor, insira o conteúdo dos arquivos para validação');
       return;
     }
 
-    updateData({ mainGoals: selectedGoals });
+    console.log('Iniciando validação de arquivos:', fileContent);
+    
+    // Simula processo de validação
+    const validationResult = {
+      status: 'success',
+      message: 'Arquivos validados com sucesso',
+      logs: `=== RELATÓRIO DE VALIDAÇÃO ===
+Data: ${new Date().toLocaleString()}
+Arquivos processados: 3
+Linhas analisadas: ${fileContent.split('\n').length}
+
+✓ Estrutura de dados: OK
+✓ Formatação: OK  
+✓ Encoding: UTF-8 válido
+✓ Tamanho: Dentro do limite
+✓ Sintaxe: Sem erros
+
+=== DETALHES ===
+- Registros válidos: ${Math.floor(Math.random() * 100) + 50}
+- Registros com warning: ${Math.floor(Math.random() * 5)}
+- Registros com erro: 0
+
+=== STATUS FINAL ===
+Validação concluída com sucesso!
+Arquivos prontos para processamento.`
+    };
+
+    updateData({ 
+      fileContent,
+      validationResult 
+    });
+    
+    onNext();
+  };
+
+  const handleNext = () => {
+    if (!fileContent.trim()) {
+      setError('Por favor, insira o conteúdo dos arquivos antes de continuar');
+      return;
+    }
+    
+    updateData({ fileContent });
     onNext();
   };
 
@@ -84,68 +73,68 @@ const StepThree = ({ data, updateData, onNext, onPrev }: StepThreeProps) => {
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Objetivos Principais
+          Validação de Arquivos
         </h2>
         <p className="text-gray-600">
-          Quais são os principais objetivos que deseja alcançar?
+          Cole o conteúdo dos seus arquivos para validação
         </p>
       </div>
 
-      {/* Goals Selection */}
+      {/* File Content Input */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            Selecione seus Objetivos
+            <Upload className="w-5 h-5" />
+            Conteúdo dos Arquivos
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {goals.map((goal) => {
-              const IconComponent = goal.icon;
-              const isSelected = selectedGoals.includes(goal.id);
-              
-              return (
-                <div
-                  key={goal.id}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                    isSelected
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => toggleGoal(goal.id)}
-                >
-                  <div className="flex items-start space-x-3">
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={() => toggleGoal(goal.id)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <IconComponent className="w-4 h-4 text-blue-600" />
-                        <h3 className="font-medium text-gray-900">
-                          {goal.label}
-                        </h3>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {goal.description}
-                      </p>
-                    </div>
-                  </div>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="fileContent" className="text-sm font-medium text-gray-700">
+              Cole o conteúdo dos arquivos aqui (máximo 1000 caracteres)
+            </Label>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <Textarea
+                  id="fileContent"
+                  placeholder="Cole aqui o conteúdo dos arquivos que deseja validar..."
+                  value={fileContent}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 1000) {
+                      setFileContent(value);
+                      if (error) setError('');
+                    }
+                  }}
+                  className={`min-h-[200px] resize-none ${error ? 'border-red-500' : ''}`}
+                  maxLength={1000}
+                />
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs text-gray-500">
+                    {fileContent.length}/1000 caracteres
+                  </span>
+                  {error && (
+                    <p className="text-sm text-red-600">{error}</p>
+                  )}
                 </div>
-              );
-            })}
+              </div>
+              <div className="flex flex-col justify-center">
+                <Button
+                  onClick={handleValidateFiles}
+                  className="flex items-center gap-2 whitespace-nowrap"
+                  disabled={!fileContent.trim()}
+                >
+                  <FileCheck className="w-4 h-4" />
+                  Validador de arquivos
+                </Button>
+              </div>
+            </div>
           </div>
-          
-          {error && (
-            <p className="text-sm text-red-600 mt-4">{error}</p>
-          )}
-          
-          {selectedGoals.length > 0 && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-700">
-                ✓ {selectedGoals.length} objetivo(s) selecionado(s)
+
+          {fileContent && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">
+                ✓ Conteúdo carregado. Clique em "Validador de arquivos" para processar ou continue para a próxima etapa.
               </p>
             </div>
           )}
@@ -158,7 +147,7 @@ const StepThree = ({ data, updateData, onNext, onPrev }: StepThreeProps) => {
           <ArrowLeft className="w-4 h-4" />
           Voltar
         </Button>
-        <Button onClick={handleNext} className="px-8">
+        <Button onClick={handleNext} className="px-8" disabled={!fileContent.trim()}>
           Continuar
         </Button>
       </div>

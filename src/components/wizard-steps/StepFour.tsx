@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plug, ArrowLeft, Database, Cloud, Mail, Calendar } from 'lucide-react';
+import { CheckCircle, ArrowLeft, FileText, AlertCircle } from 'lucide-react';
 
 interface StepFourProps {
   data: any;
@@ -13,63 +14,23 @@ interface StepFourProps {
 }
 
 const StepFour = ({ data, updateData, onNext, onPrev }: StepFourProps) => {
-  const [selectedIntegrations, setSelectedIntegrations] = useState<string[]>(data.integrations || []);
+  const validationResult = data.validationResult;
+  const hasValidationResult = validationResult && validationResult.logs;
 
-  const integrations = [
-    {
-      id: 'erp',
-      label: 'Sistema ERP',
-      description: 'SAP, Oracle, Microsoft Dynamics',
-      icon: Database,
-      popular: true,
-    },
-    {
-      id: 'crm',
-      label: 'CRM',
-      description: 'Salesforce, HubSpot, Pipedrive',
-      icon: Database,
-      popular: true,
-    },
-    {
-      id: 'email',
-      label: 'Email Marketing',
-      description: 'Mailchimp, SendGrid, Constant Contact',
-      icon: Mail,
-      popular: false,
-    },
-    {
-      id: 'calendar',
-      label: 'Calendário',
-      description: 'Google Calendar, Outlook, Apple Calendar',
-      icon: Calendar,
-      popular: true,
-    },
-    {
-      id: 'cloud',
-      label: 'Armazenamento em Nuvem',
-      description: 'AWS, Google Drive, Dropbox',
-      icon: Cloud,
-      popular: true,
-    },
-    {
-      id: 'analytics',
-      label: 'Analytics',
-      description: 'Google Analytics, Adobe Analytics',
-      icon: Database,
-      popular: false,
-    },
-  ];
+  const defaultLogs = `=== RELATÓRIO DE VALIDAÇÃO ===
+Data: ${new Date().toLocaleString()}
+Status: Aguardando validação
 
-  const toggleIntegration = (integrationId: string) => {
-    setSelectedIntegrations(prev =>
-      prev.includes(integrationId)
-        ? prev.filter(id => id !== integrationId)
-        : [...prev, integrationId]
-    );
-  };
+Para ver os logs de validação:
+1. Volte para a etapa anterior
+2. Cole o conteúdo dos arquivos
+3. Clique em "Validador de arquivos"
+
+=== AGUARDANDO PROCESSAMENTO ===`;
+
+  const displayLogs = hasValidationResult ? validationResult.logs : defaultLogs;
 
   const handleNext = () => {
-    updateData({ integrations: selectedIntegrations });
     onNext();
   };
 
@@ -78,81 +39,69 @@ const StepFour = ({ data, updateData, onNext, onPrev }: StepFourProps) => {
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Integrações Desejadas
+          Resultado da Validação
         </h2>
         <p className="text-gray-600">
-          Quais sistemas você gostaria de integrar? (Opcional)
+          Logs e informações do processo de validação dos arquivos
         </p>
       </div>
 
-      {/* Integrations Selection */}
+      {/* Validation Status */}
+      {hasValidationResult ? (
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+              <div>
+                <h3 className="font-medium text-green-900">Validação Concluída</h3>
+                <p className="text-sm text-green-700">
+                  Os arquivos foram validados com sucesso
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-6 h-6 text-orange-600" />
+              <div>
+                <h3 className="font-medium text-orange-900">Validação Pendente</h3>
+                <p className="text-sm text-orange-700">
+                  Nenhuma validação foi executada ainda
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Validation Logs */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Plug className="w-5 h-5" />
-            Sistemas para Integração
+            <FileText className="w-5 h-5" />
+            Logs de Validação
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {integrations.map((integration) => {
-              const IconComponent = integration.icon;
-              const isSelected = selectedIntegrations.includes(integration.id);
-              
-              return (
-                <div
-                  key={integration.id}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all relative ${
-                    isSelected
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => toggleIntegration(integration.id)}
-                >
-                  {integration.popular && (
-                    <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
-                      Popular
-                    </div>
-                  )}
-                  
-                  <div className="flex items-start space-x-3">
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={() => toggleIntegration(integration.id)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <IconComponent className="w-4 h-4 text-blue-600" />
-                        <h3 className="font-medium text-gray-900">
-                          {integration.label}
-                        </h3>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {integration.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700">
+              Informações detalhadas do processo
+            </Label>
+            <Textarea
+              value={displayLogs}
+              readOnly
+              className="min-h-[300px] bg-gray-50 font-mono text-sm resize-none"
+            />
           </div>
-          
-          {selectedIntegrations.length > 0 && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-700">
-                ✓ {selectedIntegrations.length} integração(ões) selecionada(s)
-              </p>
-            </div>
-          )}
-          
-          {selectedIntegrations.length === 0 && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-700">
-                💡 Você pode pular esta etapa e configurar integrações mais tarde
-              </p>
-            </div>
-          )}
+
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-700">
+              💡 Os logs mostram informações detalhadas sobre o processo de validação dos arquivos
+            </p>
+          </div>
         </CardContent>
       </Card>
 
@@ -163,7 +112,7 @@ const StepFour = ({ data, updateData, onNext, onPrev }: StepFourProps) => {
           Voltar
         </Button>
         <Button onClick={handleNext} className="px-8">
-          Continuar
+          Finalizar
         </Button>
       </div>
     </div>
