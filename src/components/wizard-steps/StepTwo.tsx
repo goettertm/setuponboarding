@@ -60,7 +60,7 @@ const StepTwo = ({ data, updateData, onNext, onPrev }: StepTwoProps) => {
                   Manual de instalação do client
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Guia completo para instalação e configuração do cliente Neogrid
+                  Guia completo para instalação e configuração do sistema
                 </p>
                 <Button 
                   onClick={handleDownloadClientManual}

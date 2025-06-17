@@ -82,7 +82,7 @@ const StepSix = ({ data, onPrev }: StepSixProps) => {
           <div className="space-y-4">
             <p className="text-blue-700">
               Para finalizar o processo, enviaremos um email de ativação para confirmar 
-              a configuração do seu sistema Neogrid.
+              a configuração do seu sistema.
             </p>
             
             {!emailSent ? (

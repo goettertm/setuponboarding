@@ -107,7 +107,7 @@ const StepOne = ({ data, updateData, onNext }: StepOneProps) => {
           <Building2 className="w-8 h-8 text-blue-600" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Seja Bem-vindo ao Sistema de Onboarding Neogrid
+          Seja Bem-vindo ao Portal de Integração
         </h2>
         <p className="text-gray-600">
           Vamos começar coletando algumas informações básicas sobre sua empresa

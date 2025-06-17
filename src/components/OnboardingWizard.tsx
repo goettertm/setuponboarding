@@ -8,6 +8,7 @@ import StepTwo from './wizard-steps/StepTwo';
 import StepThree from './wizard-steps/StepThree';
 import StepFour from './wizard-steps/StepFour';
 import StepSix from './wizard-steps/StepSix';
+
 interface OnboardingData {
   clientName: string;
   cnpj: string;
@@ -18,6 +19,7 @@ interface OnboardingData {
     logs: string;
   };
 }
+
 const OnboardingWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<OnboardingData>({
@@ -84,7 +86,7 @@ const OnboardingWizard = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Sistema de Onboarding Neogrid</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Portal de Integração</h1>
           
         </div>
 
